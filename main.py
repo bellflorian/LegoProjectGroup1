@@ -1,6 +1,6 @@
 #!/usr/bin/env pybricks-micropython
 from pybricks.hubs import EV3Brick
-from pybricks.ev3devices import Motor, ColorSensor
+from pybricks.ev3devices import Motor, ColorSensor, InfraredSensor
 from pybricks.nxtdevices import LightSensor
 from pybricks.parameters import Port, Button
 from pybricks.tools import wait
@@ -15,6 +15,7 @@ right_motor = Motor(Port.D)
 
 right_sensor = ColorSensor(Port.S1)
 left_sensor = LightSensor(Port.S4)
+front_sensor = InfraredSensor(Port.S3)
 
 # =========================================================
 # GLOBAL TUNING PARAMETERS
@@ -56,6 +57,9 @@ LEFT_BLACK_THRESHOLD = 48
 RIGHT_BLACK_THRESHOLD = 15  
 # Same as above, but for right sensor (different because sensors behave differently)
 
+IR_EDGE_THRESHOLD = 10
+# Front infrared sensor threshold. If distance is above this value, stop immediately.
+
 SHARP_CURVE_WINDOW_MS = 800  
 # Time window: if another line is detected within this time → treat it as a sharp curve
 
@@ -88,6 +92,7 @@ CONFIG_ITEMS = [
     ("EXIT_FORWARD_TIME_MS", "int", 10, 0, 3000),
     ("LEFT_BLACK_THRESHOLD", "int", 1, 0, 100),
     ("RIGHT_BLACK_THRESHOLD", "int", 1, 0, 100),
+    ("IR_EDGE_THRESHOLD", "int", 1, 0, 100),
     ("SHARP_CURVE_WINDOW_MS", "int", 10, 0, 5000),
     ("DETECTION_COOLDOWN_MS", "int", 10, 0, 5000),
     ("LOOP_DELAY_MS", "int", 1, 1, 1000),
@@ -108,6 +113,12 @@ def right_black():
 
 def any_button_pressed():
     return len(ev3.buttons.pressed()) > 0
+
+def edge_detected():
+    return front_sensor.distance() > IR_EDGE_THRESHOLD
+
+def stop_requested():
+    return any_button_pressed() or edge_detected()
 
 def stop_robot():
     left_motor.stop()
@@ -147,7 +158,7 @@ def safe_wait(ms):
 
     elapsed = 0
     while elapsed < ms:
-        if any_button_pressed():
+        if stop_requested():
             stop_robot()
             return False
         wait(10)
@@ -221,8 +232,8 @@ def draw_angry_face():
 
     # ===== EYEBROWS =====
     for i in range(6):
-        ev3.screen.draw_line(20, 25 + i, 80, 15 + i)     # links
-        ev3.screen.draw_line(160, 25 + i, 100, 15 + i)   # rechts
+        ev3.screen.draw_line(20, 25 + i, 80, 15 + i)
+        ev3.screen.draw_line(160, 25 + i, 100, 15 + i)
 
     # ===== LEFT EYE (Box) =====
     for y in range(40, 65):
@@ -238,7 +249,6 @@ def draw_angry_face():
         ev3.screen.draw_line(120, y, 130, y)
 
     # ===== ZICKZACK MOUTH =====
-    # dicke Linien für aggressiven Look
     for i in range(6):
         ev3.screen.draw_line(30, 100 + i, 60, 90 + i)
         ev3.screen.draw_line(60, 90 + i, 90, 100 + i)
@@ -365,12 +375,17 @@ def drive():
     draw_angry_face()
 
     while True:
-        if any_button_pressed():
+        if stop_requested():
             stop_robot()
             wait_release()
             return
 
         drive_forward()
+
+        if stop_requested():
+            stop_robot()
+            wait_release()
+            return
 
         if right_black():
             stop_robot()
