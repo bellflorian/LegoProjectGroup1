@@ -20,27 +20,50 @@ left_sensor = LightSensor(Port.S4)
 # GLOBAL TUNING PARAMETERS
 # =========================================================
 
-BASE_SPEED_SCALE = 1.00
+BASE_SPEED_SCALE = 1.00  
+# Global multiplier for ALL speeds → increase = everything faster, decrease = everything slower
 
-FORWARD_SPEED = 500
+FORWARD_SPEED = 500  
+# Speed while driving straight forward (main movement)
 
-REVERSE_SPEED = 260
-REVERSE_TIME_MS = 560
-SHARP_REVERSE_TIME_MS = 760
+REVERSE_SPEED = 260  
+# Speed used when driving backwards after detecting a line
 
-TURN_SPEED = 280
-TURN_TIME_MS = 320
-SHARP_TURN_TIME_MS = 420
+REVERSE_TIME_MS = 560  
+# How long the robot drives backwards (normal correction)
 
-EXIT_FORWARD_SPEED = 260
-EXIT_FORWARD_TIME_MS = 120
+SHARP_REVERSE_TIME_MS = 760  
+# Longer backward movement for sharp curves (when normal correction wasn't enough)
 
-LEFT_BLACK_THRESHOLD = 48
-RIGHT_BLACK_THRESHOLD = 15
+TURN_SPEED = 280  
+# Speed used while turning (left/right rotation)
 
-SHARP_CURVE_WINDOW_MS = 800
-DETECTION_COOLDOWN_MS = 140
-LOOP_DELAY_MS = 10
+TURN_TIME_MS = 320  
+# Duration of a normal turn after detecting a line
+
+SHARP_TURN_TIME_MS = 420  
+# Longer turn for sharp curves (more aggressive correction)
+
+EXIT_FORWARD_SPEED = 260  
+# Speed when moving forward briefly after a correction
+
+EXIT_FORWARD_TIME_MS = 120  
+# Short forward movement after turning to stabilize direction
+
+LEFT_BLACK_THRESHOLD = 48  
+# Sensor value threshold → if left sensor is BELOW this, it detects black
+
+RIGHT_BLACK_THRESHOLD = 15  
+# Same as above, but for right sensor (different because sensors behave differently)
+
+SHARP_CURVE_WINDOW_MS = 800  
+# Time window: if another line is detected within this time → treat it as a sharp curve
+
+DETECTION_COOLDOWN_MS = 140  
+# Pause after a correction → prevents reacting multiple times to the same line
+
+LOOP_DELAY_MS = 10  
+# Delay of the main loop → controls how often sensors are checked (lower = more responsive)
 
 # =========================================================
 # STATE
