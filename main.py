@@ -61,7 +61,7 @@ IR_EDGE_THRESHOLD = 10
 # Front infrared sensor threshold. If distance is above this value, stop immediately.
 
 SHARP_CURVE_WINDOW_MS = 800  
-# Time window: if another line is detected within this time → treat it as a sharp curve
+# If another line is detected within this time → treat it as a sharp curve
 
 DETECTION_COOLDOWN_MS = 140  
 # Pause after a correction → prevents reacting multiple times to the same line
